@@ -15,6 +15,13 @@ class CreatePostTagTable extends Migration
     {
         Schema::create('post_tag', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('post_id');
+            $table->foreignId('tag_id');
+
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
@@ -29,3 +36,4 @@ class CreatePostTagTable extends Migration
         Schema::dropIfExists('post_tag');
     }
 }
+
