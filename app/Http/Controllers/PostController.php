@@ -4,9 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use App\Services\Blog_api\Client;
 
 class PostController extends Controller
 {
+    protected $client;
+
+    public function __construct(Client $client)
+    {
+        $this->client = $client;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,7 +21,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        return view('welcome', [
+            'data' => $this->client->posts()->json()['data']
+        ]);
     }
 
     /**

@@ -30,4 +30,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'blogApi' => [
+        'uri' => env('BLOG_API_URI', 'https://dummyapi.io/data/v1/'),
+        'token' => env('BLOG_API_TOKEN'),
+        'timeout' => env('BLOG_TIMEOUT'),
+        'retry_times' => env('BLOG_RETRY_TIMES'),
+        'retry_milliseconds' => env('BLOG_RETRY_MILLISECONDS'),
+    ],
+
 ];
