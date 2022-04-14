@@ -22,7 +22,7 @@ class PostController extends Controller
     public function index()
     {
         return view('welcome', [
-            'data' => $this->client->posts()->json()['data']
+            'data' => json_decode($this->client->posts())->data
         ]);
     }
 

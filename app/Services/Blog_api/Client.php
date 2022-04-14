@@ -3,7 +3,9 @@
 namespace App\Services\Blog_api;
 
 use App\Services\Concerns\HasFake;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Redis;
 
 class Client 
 {
@@ -63,7 +65,9 @@ class Client
         
         }
 
-        return $response;
+        Redis::set('response', $response);
+
+        return Redis::get('response');
     }
 
 

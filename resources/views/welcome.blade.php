@@ -30,16 +30,16 @@
             @foreach ($data as $post)
                 <div class="col">
                     <div class="card">
-                        <img src="{{ $post['image'] }}" class="card-img-top" alt="...">
+                        <img src="{{ $post->image }}" class="card-img-top" alt="...">
                         <div class="card-body">
-                            <p class="card-text">{{ $post['text'] }}</p>
-                            @if (count($post['tags']) > 0)
-                                @foreach ($post['tags'] as $tag_id => $tag_name)
+                            <p class="card-text">{{ $post->text }}</p>
+                            @if (count($post->tags) > 0)
+                                @foreach ($post->tags as $tag_id => $tag_name)
                                     <span class="badge badge-success bg-success">{{ $tag_name }}</span>  
                                 @endforeach
                             @endif
                             <p class="btn btn-primary">
-                                Likes <span class="badge badge-light">{{ $post['likes'] }}</span>
+                                Likes <span class="badge badge-light">{{ $post->likes }}</span>
                             </p>
                         </div>
                     </div>
