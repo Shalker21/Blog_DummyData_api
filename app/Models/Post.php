@@ -10,7 +10,7 @@ class Post extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tag_id', 'comment_id', 'description', 'likes', 'link' 
+        '_id', 'image_url', 'text', 'likes',
     ];
 
     

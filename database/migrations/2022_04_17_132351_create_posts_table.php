@@ -16,15 +16,11 @@ class CreatePostsTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('tag_id');
-            $table->foreignId('comment_id');
+            $table->string('_id')->unique();
 
-            $table->text('description');
+            $table->string('image_url');
+            $table->text('text');
             $table->integer('likes');
-            $table->string('link');
-
-            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
-            $table->foreign('comment_id')->references('id')->on('comments')->onDelete('cascade');
 
             $table->timestamps();
         });

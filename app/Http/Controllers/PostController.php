@@ -4,16 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
-use App\Services\Blog_api\Client;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
-    protected $client;
-
-    public function __construct(Client $client)
-    {
-        $this->client = $client;
-    }
     /**
      * Display a listing of the resource.
      *
@@ -21,8 +16,14 @@ class PostController extends Controller
      */
     public function index()
     {
+        $page = request()->has('page') ? request()->query('page') : 1;
+
+        $posts = Cache::remember('posts_page_'. $page, 10, function () use($page) {
+            return DB::table('posts')->select('image_url', 'text', 'likes')->paginate(10);
+        });
+
         return view('welcome', [
-            'data' => json_decode($this->client->posts())->data
+            'data' => $posts
         ]);
     }
 

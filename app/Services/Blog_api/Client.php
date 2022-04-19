@@ -3,8 +3,10 @@
 namespace App\Services\Blog_api;
 
 use App\Services\Concerns\HasFake;
+use Exception;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Redis;
 
 class Client 
 {
@@ -15,6 +17,8 @@ class Client
     protected int $timeout; 
     protected int $retryTimes; // how much times laravel will retry (pokusaji) 
     protected int $retryMilliseconds; // how much long should wait bettween attempts
+
+    private $response;
 
     public function __construct(
         string $uri, 
@@ -36,9 +40,19 @@ class Client
         // HasFake::fake($response ?????);
     }
 
-    public function posts()
+    public function store_comments() : bool
     {
-        $request = Http::withToken($this->token) // do we need to send this token like that ??? because in docs it says to pass it in headers like app-id => token
+        return $this->_store('comment', ['_id', 'post_id', 'message']);
+    }
+
+    public function store_posts() : bool
+    {
+        return $this->_store('post', ['_id', 'image_url', 'text', 'likes']);
+    }
+
+    private function _store(string $table, array $data) : bool
+    {
+        $request = Http::withToken($this->token)
         ->withHeaders([
 
             'app-id' => $this->token,
@@ -55,20 +69,66 @@ class Client
             $request->retry($this->retryTimes, $this->retryMilliseconds); // times, sleep
         
         }
-
-        $response = $request->get($this->uri . "/post?page=5&limit=10");
-
-        if (! $response->successful()) {
         
-            return $response->toException();
-        
+        $limit = 20;
+        $page = 0;
+
+        while ($page < 999) {
+                
+            $response = $request->get($this->uri . "/".$table."?limit".$limit."&page=".$page);
+
+            if (! json_decode($response)->data) {
+                break;
+            }
+
+
+            if (! $response->successful()) {
+    
+                abort(404, $response->toException());
+    
+            }
+                    
+            $this->response = json_decode($response);
+
+            $db_inset_data = [];
+
+            foreach ($this->response->data as $number => $key_of_value) {
+
+                $insert_data = [];
+
+                foreach ($key_of_value as $key => $value) {
+
+                    foreach ($data as $data_type) {
+                        
+                        if (Str::contains($data_type, $key)) {                            
+                    
+                            $insert_data[$data_type] = $value;
+                        
+                        }
+                    
+                    }   
+                        
+                }
+
+                array_push($db_inset_data, $insert_data);
+            }
+
+            $t = $table."s";
+
+            try {
+
+                DB::table($t)->insert($db_inset_data); 
+
+            } catch (\Throwable $th) {
+
+                report($th);
+            
+            }
+
+            $page++;
         }
-
-        Redis::set('response', $response);
-
-        return Redis::get('response');
+ 
+        return true;   
     }
-
-
 
 }
